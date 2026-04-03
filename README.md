@@ -42,6 +42,36 @@ The `Any-` prefix is optional. IDs are case-insensitive. Compound IDs are suppor
 
 Custom transforms can be registered with `transliterate.Register()`.
 
+#### Loading CLDR Transform Rules
+
+Load transforms from [Unicode CLDR](https://cldr.unicode.org/) data files:
+
+```go
+// Load all transforms from a CLDR common/transforms directory
+err := transliterate.LoadCLDR("/path/to/cldr/common/transforms")
+
+// Load a single CLDR XML file
+err := transliterate.LoadCLDRFile("/path/to/Latin-Katakana.xml")
+
+// Loaded transforms are registered and accessible via New()
+tr, err := transliterate.New("Latin-Katakana")
+```
+
+#### Custom Rules
+
+Create transliterators from ICU rule syntax:
+
+```go
+tr, err := transliterate.NewFromRules("Custom", `
+    a → x ;
+    b → y ;
+    ch → Z ;
+`, transliterate.Forward)
+result, err := tr.String("abc") // "xyc"
+```
+
+The rule engine supports bidirectional rules (`↔`), context (`before { match } after`), variables (`$name = [set]`), Unicode set notation (`[:Latin:]`), normalization directives (`:: NFD ;`), and quoted literals.
+
 ## License
 
 See [LICENSE](LICENSE) file.
