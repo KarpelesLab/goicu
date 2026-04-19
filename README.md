@@ -72,6 +72,44 @@ result, err := tr.String("abc") // "xyc"
 
 The rule engine supports bidirectional rules (`↔`), context (`before { match } after`), variables (`$name = [set]`), Unicode set notation (`[:Latin:]`), normalization directives (`:: NFD ;`), and quoted literals.
 
+### breakiter
+
+ICU-compatible text segmentation (break iteration) following UAX #29 and UAX #14.
+
+```go
+import "github.com/KarpelesLab/goicu/breakiter"
+
+// Count grapheme clusters (user-perceived characters)
+n := breakiter.GraphemeCount("👨‍👩‍👧‍👦") // 1
+
+// Count words
+n = breakiter.WordCount("Hello, world!") // 2
+
+// Split into segments
+words := breakiter.SplitWords("Hello, world!")
+sentences := breakiter.SplitSentences("First. Second.")
+
+// ICU-style positional iteration
+bi := breakiter.NewWord()
+bi.SetText("Hello, world!")
+for pos := bi.First(); ; {
+    pos = bi.Next()
+    if pos == breakiter.Done {
+        break
+    }
+    fmt.Println(bi.Segment())
+}
+```
+
+#### Break Types
+
+| Type | Description | Standard |
+|---|---|---|
+| `Grapheme` | User-perceived characters (handles combining marks, emoji ZWJ, flags) | UAX #29 |
+| `Word` | Word boundaries for selection and cursor movement | UAX #29 |
+| `Sentence` | Sentence boundaries | UAX #29 |
+| `Line` | Line break opportunities for text wrapping | UAX #14 |
+
 ## License
 
 See [LICENSE](LICENSE) file.
